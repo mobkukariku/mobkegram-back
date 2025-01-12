@@ -8,15 +8,15 @@ import userRoutes from "./routes/users.route";
 import friendsRoute from "./routes/friends.route";
 import requestsRoute from "./routes/requests.route";
 import profileRoute from "./routes/profile.route";
+import {app, server} from "./lib/socket";
+import messageRoute from "./routes/message.route";
 
 dotenv.config();
-const app = express();
 
 const port = process.env.PORT;
 
 const corsOptions = {
   origin: 'http://localhost:5173',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 };
@@ -26,15 +26,14 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
-
-
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/friends", friendsRoute);
 app.use("/api/requests", requestsRoute);
 app.use("/api/profile", profileRoute);
+app.use('api/messages', messageRoute);
 
-app.listen(port, async () => {
-  await connectDB(); 
+server.listen(port, async () => {
   console.log(`Server is running on port ${port}`);
+  await connectDB();
 });

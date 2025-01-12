@@ -8,7 +8,7 @@ export const getAllSentRequests = async (req:Request, res:Response) => {
 
         const user = await User.findById(userId).populate(
             "sentRequests",
-            "username email pictureUrl name");
+            "username email pictureURL name");
         if(!user){
             res.status(404).json({message: "User not found"});
             return;
@@ -25,7 +25,7 @@ export const getAllReceivedRequests = async (req:Request, res:Response) => {
 
         const user = await User.findById(userId).populate(
             "friendRequests",
-            "username email pictureUrl name");
+            "username email pictureURL name");
         if(!user){
             res.status(404).json({message: "User not found"});
             return;

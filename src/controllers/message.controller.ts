@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import User from "../models/user.model";
 import Message from "../models/message.model";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import {getReceiverSocketId, io} from "../lib/socket";
 
 
 export const getMessages = async (req: Request, res: Response) => {
@@ -10,7 +11,11 @@ export const getMessages = async (req: Request, res: Response) => {
         const token = req.cookies.jwt;
         const decodedUser = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
         const myId = decodedUser.userId;
-        const messages = await Message.find({$or:[{from:userId, to:myId},{from:myId, to:userId}]});
+        const messages = await Message.find({
+            $or:[
+                {from:myId, to:userId},
+                {from:userId, to:myId}
+            ]});
         res.status(200).json(messages);
     }catch(err){
         console.error(err);
@@ -28,9 +33,17 @@ export const sendMessage = async (req: Request, res: Response) => {
         const token = req.cookies.jwt;
         const decodedUser = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
         const myId = decodedUser.userId;
-        const newMessage = new Message({from:myId, to:userId, message});
+        const newMessage = new Message({
+            senderId:myId,
+            senderID: userId,
+            content: message,
+        });
         await newMessage.save();
-        res.status(200).json({message: "Message sent"});
+        const receiverSocketID = getReceiverSocketId(userId);
+        if(receiverSocketID){
+            io.to(receiverSocketID).emit("newMessage", newMessage);
+        }
+        res.status(201).json({message: newMessage});
     }catch(err){
         console.error(err);
         res.status(500).json({

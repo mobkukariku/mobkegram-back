@@ -6,7 +6,7 @@ import User from "../models/user.model";
 export const getFriends = async (req: Request, res: Response) => {
     try{
         const {userId:id} = jwt.verify(req.cookies.jwt, process.env.JWT_SECRET!) as JwtPayload;
-        const user = await User.findById(id).populate("friends", "username email pictureUrl name");
+        const user = await User.findById(id).populate("friends", "username email pictureURL name");
         if (!user) {
             res.status(404).json({ message: "User not found" });
             return;
