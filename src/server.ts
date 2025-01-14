@@ -31,7 +31,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/friends", friendsRoute);
 app.use("/api/requests", requestsRoute);
 app.use("/api/profile", profileRoute);
-app.use('api/messages', messageRoute);
+app.use("/api/messages", messageRoute);
 
 server.listen(port, async () => {
   console.log(`Server is running on port ${port}`);

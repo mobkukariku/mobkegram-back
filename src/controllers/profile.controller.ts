@@ -53,6 +53,31 @@ export const updateProfile = async (req: Request, res: Response) => {
     }
 }
 
+export const changeUsername = async (req: Request, res: Response) => {
+    try{
+        const {userId} = jwt.verify(req.cookies.jwt, process.env.JWT_SECRET!) as JwtPayload;
+        const {username} = req.body;
+        if(!username){
+            res.status(500).json({message: "Username doesn't exist"});
+        }
+        const user = await User.findById(userId);
+        const anotherUser = await User.findOne({username});
+        if(anotherUser){
+            res.status(401).json({message: "Username already exist"});
+        }
+        if(!user){
+            res.status(404).json({message: "User not found"});
+            return
+        }
+        user.username = username;
+
+        user.save();
+        res.status(200).json({user});
+    }catch (err){
+        res.status(500).json({message: "Failed to update profile", err});
+    }
+}
+
 export const updatePassword = async (req: Request, res: Response) => {
     try {
         const {userId} = jwt.verify(req.cookies.jwt, process.env.JWT_SECRET!) as JwtPayload;

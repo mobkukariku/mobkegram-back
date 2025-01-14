@@ -20,7 +20,7 @@ export const SignUp = async (req: Request, res: Response) => {
 
     const token = generateToken(String(user._id), res);
 
-    res.status(201).json({ message: "User created", token });
+    res.status(201).json({ message: "User created", user, token });
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -47,7 +47,7 @@ export const Login = async (req: Request, res: Response) => {
     }
 
     const token = generateToken(String(user._id), res);
-    res.status(200).json({ message: "Login successful", token });
+    res.status(200).json({ message: "Login successful", user, token });
 
   } catch (error) {
     console.error(error);

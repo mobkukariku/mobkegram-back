@@ -12,10 +12,12 @@ export const getMessages = async (req: Request, res: Response) => {
         const decodedUser = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
         const myId = decodedUser.userId;
         const messages = await Message.find({
-            $or:[
-                {from:myId, to:userId},
-                {from:userId, to:myId}
-            ]});
+            $or: [
+                { senderID: myId, receiverID: userId },
+                { receiverID: myId, senderID: userId }
+            ]
+        }).sort({ createdAt: 1 });
+
         res.status(200).json(messages);
     }catch(err){
         console.error(err);
@@ -34,8 +36,8 @@ export const sendMessage = async (req: Request, res: Response) => {
         const decodedUser = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
         const myId = decodedUser.userId;
         const newMessage = new Message({
-            senderId:myId,
-            senderID: userId,
+            senderID:myId,
+            receiverID: userId,
             content: message,
         });
         await newMessage.save();
@@ -50,5 +52,20 @@ export const sendMessage = async (req: Request, res: Response) => {
             message: "An error occurred",
             error: err instanceof Error ? err.message : "Unknown error",
         });
+    }
+}
+
+export const getMessageForSideBar = async (req: Request, res: Response) => {
+    try{
+        const token = req.cookies.jwt;
+        const decodedUser = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+        const myId = decodedUser.userId;
+        const filteredUsers = await User.find({_id: {myId}}).select("-password");
+        res.status(200).json(filteredUsers);
+    }catch(err){
+        console.error(err);
+        res.status(500).json({
+            message: "An error occurred",
+        })
     }
 }
