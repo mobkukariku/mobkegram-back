@@ -55,17 +55,3 @@ export const sendMessage = async (req: Request, res: Response) => {
     }
 }
 
-export const getMessageForSideBar = async (req: Request, res: Response) => {
-    try{
-        const token = req.cookies.jwt;
-        const decodedUser = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
-        const myId = decodedUser.userId;
-        const filteredUsers = await User.find({_id: {myId}}).select("-password");
-        res.status(200).json(filteredUsers);
-    }catch(err){
-        console.error(err);
-        res.status(500).json({
-            message: "An error occurred",
-        })
-    }
-}
