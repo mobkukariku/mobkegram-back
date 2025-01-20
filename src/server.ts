@@ -16,7 +16,7 @@ dotenv.config();
 const port = process.env.PORT;
 
 const corsOptions = {
-  origin: 'http://localhost:5173',
+  origin: 'http://localhost:4173',
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 };
